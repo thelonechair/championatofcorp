@@ -5,15 +5,13 @@
   #define TRIG 10                   // Устанавливаем нужный пин для ультразвукового дальномера
   #define ECHO 9                    // 
   #define MAX_DISTANCE 100          // Устанавливаем максимальное расстояние измерения датчиком
-  int GRled = 12;                   // Объявляем переменные для светодиодов
-  int Rled = 13;
-  
+  int GRled = 12;                   // Объявляем переменные для светодиодо
+  unsigned long timer1 = 0;
   LiquidCrystal_I2C lcd(0x27,16,2); // Указываем I2C адрес (наиболее распространенное значение), а также параметры экрана (в случае LCD 1602 - 2 строки по 16 символов в каждой 
   NewPing sonar (TRIG,ECHO, MAX_DISTANCE);
   
   void setup() { 
-    pinMode(GRled,OUTPUT);           // Установка режима работы пинов
-    pinMode(Rled,OUTPUT);            
+    pinMode(GRled,OUTPUT);           // Установка режима работы пинов           
     Serial.begin(9600);
     lcd.init();                      // Инициализация дисплея  
     lcd.backlight();                 // Подключение подсветки
@@ -26,9 +24,11 @@
       digitalWrite(GRled, HIGH);
       lcd.setCursor(0,0);
       lcd.print("HELLO"); 
-      // ПОМЕНЯЙ НА МИКРОС
-      lcd.clear();
-      
+      timer1 = millis();
+      if(millis() - timer1 >= 5000) 
+      {
+        lcd.clear();                
+      }
     }
     else                            // в противном случае зеленный светодиод выключен, дисплей очищен
     {
