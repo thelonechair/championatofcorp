@@ -1,0 +1,65 @@
+#include <LiquidCrystal_I2C.h>
+int brightness = 0;    // уставливаем начально значение яркости
+int fadeAmount = 1;    // шаг приращения/убывания яркости
+int Rled = 11;
+int button1 = 4;
+int button2 = 5;
+unsigned long timer1;
+unsigned long Waiting=6000;//величина выдержки
+
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Указываем I2C адрес (наиболее распространенное значение), а также параметры экрана (в случае LCD 1602 - 2 строки по 16 символов в каждой
+bool flag1 = false;
+bool flag2 = false;
+
+void setup() 
+{ 
+  pinMode(Rled, OUTPUT);
+  pinMode(button1, INPUT);
+  pinMode(button2, INPUT);
+  lcd.init();                        // Инициализация дисплея
+  lcd.backlight();                 // Подключение подсветки
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  bool btnState1 = digitalRead(4);
+  bool btnState2 = digitalRead(5);
+  if (btnState1 == true && timer1 == 0 && btnState2 == false) 
+  {
+    flag1 = true;
+    timer1 = millis() + Waiting;
+  }
+  if (flag1 == true) 
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("PLEASE HOLD");
+    digitalWrite(Rled, HIGH);   
+  }
+  if (timer1 < millis() && timer1 != 0 && flag2 == false)
+  {
+    lcd.clear();
+    changeBright();
+    flag1 = false;
+  }
+  if (btnState2 == true && timer1 > millis() && timer1 != 0)
+  {
+   flag1 = false;
+   flag2 = true;
+  }
+  if (flag2 == true)
+  {
+    lcd.clear();
+    digitalWrite(Rled, LOW);
+  }
+}
+int changeBright()
+{
+  analogWrite(11, brightness);
+  brightness = brightness + fadeAmount;
+  if (brightness == 0 || brightness == 255)
+ {
+  fadeAmount = -fadeAmount ;
+ }
+}
